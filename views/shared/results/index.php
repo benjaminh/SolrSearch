@@ -70,25 +70,29 @@
       <?php $label = SolrSearch_Helpers_Facet::keyToLabel($name); ?>
       <strong><?php echo $label; ?></strong>
 
-      <ul>
-        <!-- Facets. -->
-        <?php foreach ($facets as $value => $count): ?>
-          <li class="<?php echo $value; ?>">
+      <?php if ( $name == "collection" ): ?>
+          <?php echo SolrSearch_Helpers_Facet::collectionTreeFullListFacet(); ?>
+      <?php else: ?>
+        <ul>
+          <!-- Facets. -->
+          <?php foreach ($facets as $value => $count): ?>
+            <li class="<?php echo $value; ?>">
 
-            <!-- Facet URL. -->
-            <?php $url = SolrSearch_Helpers_Facet::addFacet($name, $value); ?>
+              <!-- Facet URL. -->
+              <?php $url = SolrSearch_Helpers_Facet::addFacet($name, $value); ?>
 
-            <!-- Facet link. -->
-            <a href="<?php echo $url; ?>" class="facet-value">
-              <?php echo $value; ?>
-            </a>
+              <!-- Facet link. -->
+              <a href="<?php echo $url; ?>" class="facet-value">
+                <?php echo $value; ?>
+              </a>
 
-            <!-- Facet count. -->
-            (<span class="facet-count"><?php echo $count; ?></span>)
+              <!-- Facet count. -->
+              (<span class="facet-count"><?php echo $count; ?></span>)
 
-          </li>
-        <?php endforeach; ?>
-      </ul>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
 
     <?php endif; ?>
 
@@ -125,7 +129,7 @@
             ?></a>
 
         <!-- Result type. -->
-        <span class="result-type">(<?php echo $doc->resulttype; ?>)</span>
+        <!-- <span class="result-type">(<?php //echo $doc->resulttype; ?>)</span> -->
 
       </div>
 
@@ -141,6 +145,7 @@
       <?php endif; ?>
 
       <?php
+        /*
         $item = get_db()->getTable($doc->model)->find($doc->modelid);
         echo item_image_gallery(
             array('wrapper' => array('class' => 'gallery')),
@@ -148,6 +153,7 @@
             false,
             $item
         );
+        */
       ?>
 
     </div>

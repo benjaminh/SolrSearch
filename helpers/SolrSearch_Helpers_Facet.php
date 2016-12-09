@@ -132,5 +132,74 @@ class SolrSearch_Helpers_Facet
         return $fields->findBySlug(rtrim($key, '_s'))->label;
     }
 
+    /**
+     * Recursively build a nested HTML unordered list from the provided
+     * collection tree.
+     *
+     * @see CollectionTreeTable::getCollectionTree()
+     * @see CollectionTreeTable::getAncestorTree()
+     * @see CollectionTreeTable::getDescendantTree()
+     * @param array $collectionTree
+     * @param bool $linkToCollectionShow
+     * @return string
+     */
+    public static function collectionTreeListFacet($collectionTree)
+    {
+        if (!$collectionTree) {
+            return;
+        }
+        $collectionTable = get_db()->getTable('Collection');
+        $html = '<ul>';
+        foreach ($collectionTree as $collection) {
+            $html .= '<li class="facet-value">';
+            $url   = self::addFacet("collection", $collection['name']);
+            $branch = $collection['children'];
+            if (!$branch) {
+              $html .= '<a href="' . $url . '" class="facet-value">' . $collection['name'] . '</a>';
+            }
+            else {
+              $html .= '<p class="facet-value">' . $collection['name'] . '</p>';
+            }
+            $html .= self::collectionTreeListFacet($collection['children']);
+            $html .= '</li>';
+        }
+        $html .= '</ul>';
+        return $html;
+    }
+
+    /**
+     * Use CollectionTree data to create collection facte hierarchy
+     *
+     *
+     */
+    public static function collectionTreeFullListFacet()
+    {
+      $rootCollections = get_db()->getTable('CollectionTree')->getRootCollections();
+      // Return NULL if there are no root collections.
+      if (!$rootCollections) {
+          return null;
+      }
+      $collectionTable = get_db()->getTable('Collection');
+      $html = '<ul>';
+      foreach ($rootCollections as $rootCollection) {
+          $html .= '<li class="facet-value">';
+          $name  = $rootCollection['name'];
+          $url   = self::addFacet("collection", $name);
+
+          $collectionTree = get_db()->getTable('CollectionTree')->getDescendantTree($rootCollection['id']);
+
+          if (!$collectionTree) {
+            $html .= '<a href="' . $url . '" class="facet-value">' . $name . '</a>';
+          }
+          else {
+            $html .= '<p class="facet-value">' . $name . '</p>';
+          }
+          $html .= self::collectionTreeListFacet($collectionTree);
+          $html .= '</li>';
+      }
+      $html .= '</ul>';
+      return $html;
+    }
+
 
 }
